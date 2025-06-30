@@ -15,5 +15,7 @@ urlpatterns = [
     path('computers/add/', views.add_computer, name='add_computer'),
     path('computers/<int:pk>/', views.computer_detail, name='computer_detail'),
     path('computers/<int:pk>/edit/', views.edit_computer, name='edit_computer'),
+    path('computers/export/csv/', views.export_computers_csv, name='export_computers_csv'),
+    path('computers/export/csv/<str:room>/', views.export_computers_csv, name='export_computers_csv_room'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 ]
