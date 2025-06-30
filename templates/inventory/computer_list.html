@@ -35,8 +35,8 @@
         </select>
     </div>
     <div class="col-md-6 col-12 text-end mt-2 mt-md-0">
-        <a href="{% url 'export_computers_csv' %}" class="btn btn-primary">
-            <i class="fas fa-download"></i> Download All Computers (CSV)
+        <a id="downloadCsvBtn" href="{% url 'export_computers_csv' %}" class="btn btn-primary">
+            <i class="fas fa-download"></i> Download CSV
         </a>
     </div>
 </div>
@@ -48,9 +48,6 @@
                 <h5 class="card-title mb-0">
                     <i class="fas fa-building me-2"></i>{{ room }} - Computer Laboratory
                 </h5>
-                <a href="{% url 'export_computers_csv_room' room=room %}" class="btn btn-outline-primary btn-sm">
-                    <i class="fas fa-download"></i> Download CSV
-                </a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -152,7 +149,9 @@
     });
 
     // Room filter functionality
-    document.getElementById('roomFilter').addEventListener('change', function() {
+    const roomFilter = document.getElementById('roomFilter');
+    const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+    roomFilter.addEventListener('change', function() {
         const selectedRoom = this.value;
         document.querySelectorAll('.room-table').forEach(function(tableDiv) {
             if (selectedRoom === 'all' || tableDiv.getAttribute('data-room') === selectedRoom) {
@@ -161,6 +160,12 @@
                 tableDiv.style.display = 'none';
             }
         });
+        // Update download button href
+        if (selectedRoom === 'all') {
+            downloadCsvBtn.href = "{% url 'export_computers_csv' %}";
+        } else {
+            downloadCsvBtn.href = "{% url 'export_computers_csv_room' room='ROOM_PLACEHOLDER' %}".replace('ROOM_PLACEHOLDER', selectedRoom);
+        }
     });
 </script>
 {% endblock %} 
