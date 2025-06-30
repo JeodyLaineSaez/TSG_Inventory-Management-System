@@ -1,4 +1,5 @@
 from ast import PyCF_ALLOW_TOP_LEVEL_AWAIT
+from cProfile import label
 from types import ModuleType
 from django import forms
 from .models import Item, Computer
@@ -17,7 +18,7 @@ class ItemForm(forms.ModelForm):
         ("bottle/s", "bottle/s"),
         ("other", "Other")
     ]
-    unit = forms.ChoiceField(choices=UNIT_CHOICES, required=False)
+    unit = forms.ChoiceField(choices=UNIT_CHOICES, required=True)
     class Meta:
         model = Item
         fields = [
@@ -33,6 +34,18 @@ class ItemForm(forms.ModelForm):
         } 
 
 class ComputerForm(forms.ModelForm):
+    ENTITY_CHOICES = [
+        ("Surigao del Norte State University - City Campus", "Surigao del Norte State University - City Campus"),
+    ]
+    entity_name = forms.ChoiceField(choices=ENTITY_CHOICES, required=False, label="Entity Name")
+    
+    CUSTODY_CHOICES = [
+        ("TSG", "TSG")
+    ]
+    custody = forms.ChoiceField(choices=CUSTODY_CHOICES, required=False)
+    
+    mr = forms.CharField(max_length=100, required=False, label="Memorandum Receipt")
+    
     ROOM_CHOICES = [
         ("EB204", "EB204"),
         ("EB205", "EB205"), 
@@ -121,7 +134,7 @@ class ComputerForm(forms.ModelForm):
     class Meta:
         model = Computer
         fields = [
-            'room', 'unit_no', 'motherboard', 'storage', 'processor', 'video_card_0', 'video_card_1', 'ram', 'ram_slot',
+            'entity_name', 'custody', 'mr', 'room', 'unit_no', 'motherboard', 'storage', 'processor', 'video_card_0', 'video_card_1', 'ram', 'ram_slot',
             'mouse', 'keyboard', 'monitor_model', 'monitor_serial_number', 'remarks', 'status', 'last_maintenance'
         ]
         widgets = {
