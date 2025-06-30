@@ -12,6 +12,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['x']
 
+CSRF_TRUSTED_ORIGINS = ['https://tsg-inventory-management-system.onrender.com']
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
