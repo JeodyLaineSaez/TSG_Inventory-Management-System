@@ -62,6 +62,12 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Categories"
 
+class Room(models.Model):
+    room = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.room
+
 class Item(models.Model):
     STATUS_CHOICES = [
         ('available', 'Available'),
@@ -102,7 +108,7 @@ class Computer(models.Model):
     entity_name =  models.CharField(max_length=100, null=True, blank=True)
     custody = models.CharField(max_length=100, null=True, blank=True)
     mr = models.CharField(max_length=100, null=True, blank=True)
-    room = models.CharField(max_length=50, null=True, blank=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, null=True, blank=True)
     unit_no = models.CharField(max_length=50, null=True, blank=True)
     motherboard = models.CharField(max_length=50, null=True, blank=True)
     storage = models.CharField(max_length=50, null=True, blank=True)
