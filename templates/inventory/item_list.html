@@ -73,10 +73,10 @@
                                 <tbody>
                                     {% for item in items %}
                                     <tr>
-                                        <td><a href="{% url 'work_order_request_create_for_item' item.id %}">{{ item.id }}</a></td>
+                                        <td>{{ item.id }}</td>
                                         <td>{{ item.entity.entity_name }}</td>
                                         <td>{{ item.fund_cluster }}</td>
-                                        <td>{{ item.name }}</td>
+                                        <td><a href="{% url 'work_order_request_list_and_add' %}?item_id={{ item.id }}">{{ item.name }}</a></td>
                                         <td>{{ item.category.name }}</td>
                                         <td>{{ item.quantity }}</td>
                                         <td>{{ item.unit }}</td>

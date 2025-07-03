@@ -12,6 +12,9 @@ from .forms import ItemForm, ComputerForm, WorkOrderRequestForm
 import csv
 from django.http import HttpResponse
 from typing import TYPE_CHECKING
+from docx import Document
+import tempfile
+from docxtpl import DocxTemplate
 if TYPE_CHECKING:
     from .models import Computer
 
@@ -228,4 +231,72 @@ def work_order_request_create(request, item_id=None):
             return redirect('work_order_request_list')
     else:
         form = WorkOrderRequestForm(initial=initial)
-    return render(request, 'inventory/work_order_request_form.html', {'form': form, 'action': 'Add'}) 
+    return render(request, 'inventory/work_order_request_form.html', {'form': form, 'action': 'Add'})
+
+def work_order_request_list_and_add(request):
+    item_id = request.GET.get('item_id')
+    initial = {}
+    if item_id:
+        initial['item'] = item_id
+    if request.method == 'POST':
+        form = WorkOrderRequestForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('work_order_request_list_and_add')
+    else:
+        form = WorkOrderRequestForm(initial=initial)
+    work_orders = WorkOrderRequest.objects.all().order_by('-datetime_started')
+    return render(request, 'inventory/work_order_request_list_and_add.html', {
+        'form': form,
+        'work_orders': work_orders,
+    })
+
+def delete_work_order_request(request, pk):
+    work_order = get_object_or_404(WorkOrderRequest, pk=pk)
+    if request.method == 'POST':
+        work_order.delete()
+        return redirect('work_order_request_list_and_add')
+    return redirect('work_order_request_list_and_add')
+
+def update_work_order_request(request, pk):
+    work_order = get_object_or_404(WorkOrderRequest, pk=pk)
+    if request.method == 'POST':
+        form = WorkOrderRequestForm(request.POST, instance=work_order)
+        if form.is_valid():
+            form.save()
+            return redirect('work_order_request_list_and_add')
+    else:
+        form = WorkOrderRequestForm(instance=work_order)
+    work_orders = WorkOrderRequest.objects.all().order_by('-datetime_started')
+    return render(request, 'inventory/work_order_request_list_and_add.html', {
+        'form': form,
+        'work_orders': work_orders,
+        'edit_id': pk,
+    })
+
+def export_work_order_docx(request, pk):
+    work_order = get_object_or_404(WorkOrderRequest, pk=pk)
+    template_path = 'static/WORK ORDER REQUEST.docx'
+    doc = DocxTemplate(template_path)
+
+    context = {
+        'wo': {
+            'datetime_started': work_order.datetime_started.strftime('%Y-%m-%d %H:%M'),
+            'get_type_display': work_order.get_type_display(),
+            'description': work_order.description or '',
+            'requested_by': work_order.requested_by or '',
+            'actions_taken': work_order.action_taken or '',
+            'remarks': work_order.remarks or '',
+            'datetime_completed': work_order.datetime_completed.strftime('%Y-%m-%d %H:%M') if work_order.datetime_completed else '',
+            'accomplished_by': work_order.accomplished_by.name if work_order.accomplished_by else '',
+            'conformed': work_order.conformed_by or '',
+        }
+    }
+
+    doc.render(context)
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.docx') as tmp:
+        doc.save(tmp.name)
+        tmp.seek(0)
+        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = f'attachment; filename=work_order_{work_order.pk}.docx'
+        return response 

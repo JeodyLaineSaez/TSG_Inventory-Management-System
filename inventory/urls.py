@@ -18,7 +18,10 @@ urlpatterns = [
     path('computers/export/csv/', views.export_computers_csv, name='export_computers_csv'),
     path('computers/export/csv/<str:room>/', views.export_computers_csv, name='export_computers_csv_room'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
-    path('work-orders/', views.work_order_request_list, name='work_order_request_list'),
+    path('work-orders/', views.work_order_request_list_and_add, name='work_order_request_list_and_add'),
     path('work-orders/add/', views.work_order_request_create, name='work_order_request_create'),
     path('work-orders/add/<int:item_id>/', views.work_order_request_create, name='work_order_request_create_for_item'),
+    path('work-orders/<int:pk>/delete/', views.delete_work_order_request, name='delete_work_order_request'),
+    path('work-orders/<int:pk>/edit/', views.update_work_order_request, name='update_work_order_request'),
+    path('work-orders/<int:pk>/export_docx/', views.export_work_order_docx, name='export_work_order_docx'),
 ]

@@ -5,3 +5,4 @@ django-crispy-forms>=2.1
 crispy-bootstrap5>=2023.10
 gunicorn
 psycopg2-binary
+docxtpl
